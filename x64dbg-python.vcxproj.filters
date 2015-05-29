@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk">
+      <UniqueIdentifier>{c1da8cdf-a9ee-44c4-b3cd-1c80f423d5d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\TitanEngine">
+      <UniqueIdentifier>{5e6574a6-83dc-45c6-b04d-36cc9e285f85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\XEDParse">
+      <UniqueIdentifier>{9a9250a7-4eba-4138-ab27-aac113d2311d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\BeaEngine">
+      <UniqueIdentifier>{3224b0d7-55d2-45a9-bfde-15adfda46e7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\dbghelp">
+      <UniqueIdentifier>{88c799f9-d796-4cf1-be07-6d317ab7e298}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\DeviceNameResolver">
+      <UniqueIdentifier>{55d815ad-811f-46e0-ae52-5a1cb202b8c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\jansson">
+      <UniqueIdentifier>{9b6e15e4-c557-4eac-86f3-3e3013411201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pluginsdk\lz4">
+      <UniqueIdentifier>{d0acf554-96b2-439c-a87e-01db279bec62}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pluginmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctionGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pluginmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\_plugin_types.h">
+      <Filter>Header Files\pluginsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\_plugins.h">
+      <Filter>Header Files\pluginsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\bridgemain.h">
+      <Filter>Header Files\pluginsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\TitanEngine\TitanEngine.h">
+      <Filter>Header Files\pluginsdk\TitanEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\_dbgfunctions.h">
+      <Filter>Header Files\pluginsdk</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\BeaEngine\basic_types.h">
+      <Filter>Header Files\pluginsdk\BeaEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\BeaEngine\BeaEngine.h">
+      <Filter>Header Files\pluginsdk\BeaEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\BeaEngine\export.h">
+      <Filter>Header Files\pluginsdk\BeaEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\BeaEngine\macros.h">
+      <Filter>Header Files\pluginsdk\BeaEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\dbghelp\dbghelp.h">
+      <Filter>Header Files\pluginsdk\dbghelp</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\DeviceNameResolver\DeviceNameResolver.h">
+      <Filter>Header Files\pluginsdk\DeviceNameResolver</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\jansson\jansson.h">
+      <Filter>Header Files\pluginsdk\jansson</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\jansson\jansson_config.h">
+      <Filter>Header Files\pluginsdk\jansson</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\lz4\lz4.h">
+      <Filter>Header Files\pluginsdk\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\lz4\lz4file.h">
+      <Filter>Header Files\pluginsdk\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\lz4\lz4hc.h">
+      <Filter>Header Files\pluginsdk\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\XEDParse\XEDParse.h">
+      <Filter>Header Files\pluginsdk\XEDParse</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

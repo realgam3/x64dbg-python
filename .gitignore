@@ -1,0 +1,10 @@
+bin/
+obj/
+Win32/
+x64/
+*.opensdf
+*.sdf
+*.suo
+*.layout
+*.depend
+ipch/
