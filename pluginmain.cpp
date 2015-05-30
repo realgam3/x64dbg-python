@@ -1,6 +1,5 @@
 #include "pluginmain.h"
-#include "test.h"
-#include <python.h>
+#include "py.h"
 
 #define plugin_name "x64dbg-python"
 #define plugin_version 1
@@ -18,20 +17,13 @@ DLL_EXPORT bool pluginit(PLUG_INITSTRUCT* initStruct)
     initStruct->sdkVersion = PLUG_SDKVERSION;
     strcpy(initStruct->pluginName, plugin_name);
     pluginHandle = initStruct->pluginHandle;
-    // Initialize the python environment, prepare the hooks
-    Py_Initialize();
-    PyEval_InitThreads();
-
-    testInit(initStruct);
+    pyInit(initStruct);
     return true;
 }
 
 DLL_EXPORT bool plugstop()
 {
-    // Properly ends the python environment
-    Py_Finalize();
-
-    testStop();
+    pyStop();
     return true;
 }
 
@@ -42,7 +34,7 @@ DLL_EXPORT void plugsetup(PLUG_SETUPSTRUCT* setupStruct)
     hMenuDisasm = setupStruct->hMenuDisasm;
     hMenuDump = setupStruct->hMenuDump;
     hMenuStack = setupStruct->hMenuStack;
-    testSetup();
+    pySetup();
 }
 
 extern "C" DLL_EXPORT BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)

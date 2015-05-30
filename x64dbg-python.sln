@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x64dbg-python", "x64dbg-python.vcxproj", "{E0AF1295-6B0B-BE4E-8436-299A95787A2C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x64dbg-python", "x64dbg-python.vcxproj", "{24401674-9DDB-17C3-5859-4A8BB7160EBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E0AF1295-6B0B-BE4E-8436-299A95787A2C}.Release|Win32.ActiveCfg = Release|Win32
-		{E0AF1295-6B0B-BE4E-8436-299A95787A2C}.Release|Win32.Build.0 = Release|Win32
-		{E0AF1295-6B0B-BE4E-8436-299A95787A2C}.Release|x64.ActiveCfg = Release|x64
-		{E0AF1295-6B0B-BE4E-8436-299A95787A2C}.Release|x64.Build.0 = Release|x64
+		{24401674-9DDB-17C3-5859-4A8BB7160EBD}.Release|Win32.ActiveCfg = Release|Win32
+		{24401674-9DDB-17C3-5859-4A8BB7160EBD}.Release|Win32.Build.0 = Release|Win32
+		{24401674-9DDB-17C3-5859-4A8BB7160EBD}.Release|x64.ActiveCfg = Release|x64
+		{24401674-9DDB-17C3-5859-4A8BB7160EBD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,12 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FunctionGraph.cpp" />
     <ClCompile Include="pluginmain.cpp" />
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="py.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FunctionGraph.h" />
     <ClInclude Include="pluginmain.h" />
     <ClInclude Include="pluginsdk\BeaEngine\basic_types.h" />
     <ClInclude Include="pluginsdk\BeaEngine\BeaEngine.h" />
@@ -35,7 +33,7 @@
     <ClInclude Include="pluginsdk\_dbgfunctions.h" />
     <ClInclude Include="pluginsdk\_plugins.h" />
     <ClInclude Include="pluginsdk\_plugin_types.h" />
-    <ClInclude Include="test.h" />
+    <ClInclude Include="py.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>

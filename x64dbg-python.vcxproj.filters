@@ -42,18 +42,12 @@
     <ClCompile Include="pluginmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FunctionGraph.cpp">
+    <ClCompile Include="py.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pluginmain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pluginsdk\_plugin_types.h">
@@ -107,7 +101,7 @@
     <ClInclude Include="pluginsdk\XEDParse\XEDParse.h">
       <Filter>Header Files\pluginsdk\XEDParse</Filter>
     </ClInclude>
-    <ClInclude Include="FunctionGraph.h">
+    <ClInclude Include="py.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
