@@ -1,18 +1,21 @@
 #!/usr/bin/env python
+import sys
 from distutils.core import setup, Extension
 
+IS_64BIT = sys.maxsize > 2**32
+
 setup(
-    name='x64dbg',
+    name='x64dbg_python',
     version='1.0',
-    description='Python x64dbg sdk library',
+    description='Python x64dbg SDK Library',
     author='Tomer Zait (RealGame)',
     author_email='realgam3@gmail.com',
-    py_modules=['_x64dbg'],
+    packages=['x64dbg_python'],
     ext_modules=[Extension(
-            '__x64dbg', ['__x64dbg.cpp'],
+            r'x64dbg_python.__x64dbg', [r'x64dbg_python\__x64dbg.cpp'],
             language='c++',
             include_dirs=[r'..\pluginsdk'],
             library_dirs=[r'..\pluginsdk'],
-            libraries=['x32_bridge', 'x32_dbg'],
+            libraries=['x64_bridge', 'x64_dbg'] if IS_64BIT else ['x32_bridge', 'x32_dbg'],
     )]
 )

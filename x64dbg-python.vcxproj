@@ -66,12 +66,16 @@
     <TargetExt>.dll</TargetExt>
     <IncludePath>$(Python27x86)\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(Python27x86)\libs;$(LibraryPath)</LibraryPath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\x64\</OutDir>
     <TargetName>x64dbg-python</TargetName>
     <TargetExt>.dll</TargetExt>
+    <IncludePath>$(Python27x64)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Python27x64)\libs;$(LibraryPath)</LibraryPath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -117,6 +121,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>psapi.lib;pluginsdk\x64_dbg.lib;pluginsdk\x64_bridge.lib;pluginsdk\TitanEngine\TitanEngine_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>install64.bat</Command>
+      <Message>Install x64dbg-python plugin 64bit version</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
