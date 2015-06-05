@@ -1,4 +1,4 @@
 @echo off
 set PLUGINDIR=..\x64_dbg\bin\x64\plugins
 mkdir %PLUGINDIR%
-copy bin\x64\testplugin.dll %PLUGINDIR%\testplugin.dp64
+copy bin\x64\x64dbg-python.dll %PLUGINDIR%\x64dbg_python.dp64

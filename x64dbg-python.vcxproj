@@ -62,7 +62,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\x32\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>testplugin</TargetName>
+    <TargetName>x64dbg-python</TargetName>
     <TargetExt>.dll</TargetExt>
     <IncludePath>$(Python27x86)\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(Python27x86)\libs;$(LibraryPath)</LibraryPath>
@@ -70,7 +70,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\x64\</OutDir>
-    <TargetName>testplugin</TargetName>
+    <TargetName>x64dbg-python</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -88,6 +88,20 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>psapi.lib;pluginsdk\x32_dbg.lib;pluginsdk\x32_bridge.lib;pluginsdk\TitanEngine\TitanEngine_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>install32.bat</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Install x64dbg-python plugin 32bit version</Message>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>
+      </Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

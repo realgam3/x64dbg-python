@@ -78,6 +78,7 @@ void pyInit(PLUG_INITSTRUCT* initStruct)
     // Initialize the python environment
     Py_Initialize();
     PyEval_InitThreads();
+    PyRun_SimpleString("from x64dbg_python import *\n");
 }
 
 void pyStop()
