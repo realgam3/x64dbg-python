@@ -6,6 +6,12 @@
 // Allow Python Buffers
 %include <pybuffer.i>
 
+// Type Maps
+/* Convert from C --> Python */
+%typemap(out) HWND {
+    $result = PyInt_FromLong((long)$1);
+}
+
 //Debugger functions
 // extern const char* DbgInit();
 // extern void DbgExit();
@@ -98,7 +104,10 @@ extern void GuiUpdateRegisterView();
 extern void GuiUpdateDisassemblyView();
 extern void GuiUpdateBreakpointsView();
 extern void GuiUpdateWindowTitle(const char* filename);
+
+// Mapped
 extern HWND GuiGetWindowHandle();
+
 extern void GuiDumpAt(duint va);
 extern void GuiScriptAdd(int count, const char** lines);
 extern void GuiScriptClear();
