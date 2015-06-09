@@ -2,7 +2,8 @@
 import sys
 from distutils.core import setup, Extension
 
-IS_64BIT = sys.maxsize > 2**32
+def is_64bit():
+    return sys.maxsize > 2**32
 
 setup(
     name='x64dbg_python',
@@ -16,6 +17,6 @@ setup(
             language='c++',
             include_dirs=[r'..\pluginsdk'],
             library_dirs=[r'..\pluginsdk'],
-            libraries=['x64_bridge', 'x64_dbg'] if IS_64BIT else ['x32_bridge', 'x32_dbg'],
+            libraries=['x64_bridge', 'x64_dbg'] if is_64bit() else ['x32_bridge', 'x32_dbg'],
     )]
 )

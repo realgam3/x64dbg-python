@@ -96,6 +96,6 @@ void pyStop()
 
 void pySetup()
 {
-    _plugin_menuaddentry(hMenu, MENU_OPEN, "&OpenScript...");
+    _plugin_menuaddentry(hMenu, MENU_OPEN, "&OpenScript...\tALT+F7");
     _plugin_menuaddentry(hMenu, MENU_ABOUT, "&About");
 }
