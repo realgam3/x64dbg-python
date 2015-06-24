@@ -8,3 +8,8 @@ x64/
 *.layout
 *.depend
 ipch/
+.idea
+swig/build/
+swig/x64dbg_python/__x64dbg.cpp
+swig/x64dbg_python/_x64dbg.py
+swig/compile*.bat
