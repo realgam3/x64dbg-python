@@ -4,11 +4,11 @@ __version__ = '1.0.0'
 import sys
 from bridgemain import *
 from _plugins import _plugin_logprintf, _plugin_logputs
+from _scriptapi import *
 
 
 def raw_input(prompt=''):
     return GuiGetLineWindow(prompt)
-
 
 def input(prompt=''):
     return eval(GuiGetLineWindow(prompt))

@@ -17,6 +17,6 @@ setup(
             language='c++',
             include_dirs=[r'..\pluginsdk'],
             library_dirs=[r'..\pluginsdk'],
-            libraries=['x64_bridge', 'x64_dbg'] if is_64bit() else ['x32_bridge', 'x32_dbg'],
+            libraries=['x64bridge', 'x64dbg'] if is_64bit() else ['x32bridge', 'x32dbg'],
     )]
 )

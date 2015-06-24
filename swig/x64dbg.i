@@ -5,3 +5,6 @@
 
 // _plugins.h
 %include "_plugins.i"
+
+//_scriptapi.h
+%include "_scriptapi.i"
