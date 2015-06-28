@@ -67,6 +67,18 @@ static bool cbOpenScriptCommand(int argc, char* argv[])
     return true;
 }
 
+static void cbOpenScriptCallback(CBTYPE cbType, void* info)
+{
+    PLUG_CB_WINEVENT* callbackInfo = ((PLUG_CB_WINEVENT*)info);
+    switch(callbackInfo->message->message)
+    {
+    case WM_HOTKEY:
+        if(callbackInfo->message->wParam == 1)
+            cbOpenScriptCommand(NULL, NULL);
+        break;
+    }
+}
+
 void pyInit(PLUG_INITSTRUCT* initStruct)
 {
     _plugin_logprintf("[PYTHON] pluginHandle: %d\n", pluginHandle);
@@ -89,6 +101,7 @@ void pyStop()
     _plugin_menuclear(hMenuDisasm);
     _plugin_menuclear(hMenuDump);
     _plugin_menuclear(hMenuStack);
+    _plugin_unregistercallback(pluginHandle, CB_WINEVENT);
 
     // Properly ends the python environment
     Py_Finalize();
@@ -98,4 +111,7 @@ void pySetup()
 {
     _plugin_menuaddentry(hMenu, MENU_OPEN, "&OpenScript...\tALT+F7");
     _plugin_menuaddentry(hMenu, MENU_ABOUT, "&About");
+    // Set HotKey
+    if(RegisterHotKey(hwndDlg, 1, MOD_ALT | MOD_NOREPEAT, VK_F7))
+        _plugin_registercallback(pluginHandle, CB_WINEVENT, cbOpenScriptCallback);
 }
