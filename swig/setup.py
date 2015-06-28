@@ -11,9 +11,13 @@ setup(
     description='Python x64dbg SDK Library',
     author='Tomer Zait (RealGame)',
     author_email='realgam3@gmail.com',
-    packages=['x64dbg_python'],
+    packages=[
+        'x64dbg_python',
+        'x64dbg_python.pluginsdk',
+        'x64dbg_python.pluginsdk._scriptapi',
+    ],
     ext_modules=[Extension(
-            r'x64dbg_python.__x64dbg', [r'x64dbg_python\__x64dbg.cpp'],
+            r'x64dbg_python.pluginsdk.__x64dbg', [r'x64dbg_python\pluginsdk\__x64dbg.cpp'],
             language='c++',
             include_dirs=[r'..\pluginsdk'],
             library_dirs=[r'..\pluginsdk'],

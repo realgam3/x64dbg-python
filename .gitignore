@@ -10,6 +10,6 @@ x64/
 ipch/
 .idea
 swig/build/
-swig/x64dbg_python/__x64dbg.cpp
-swig/x64dbg_python/_x64dbg.py
+swig/x64dbg_python/pluginsdk/__x64dbg.cpp
+swig/x64dbg_python/pluginsdk/_x64dbg.py
 swig/compile*.bat

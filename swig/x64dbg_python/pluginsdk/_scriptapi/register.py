@@ -1,41 +1,6 @@
-import _x64dbg
+from .. import _x64dbg
 
 
-# Debug
-def Wait():
-    _x64dbg.Wait()
-
-def Run():
-    _x64dbg.Run()
-
-def Stop():
-    _x64dbg.Stop()
-
-def StepIn():
-    _x64dbg.StepIn()
-
-def StepOver():
-    _x64dbg.StepOver()
-
-def StepOut():
-    _x64dbg.StepOut()
-
-
-# Memory
-def ReadByte(addr):
-    return _x64dbg.ReadByte(addr)
-
-def WriteByte(addr, data):
-    return _x64dbg.WriteByte(addr, data)
-
-def ReadDword(addr):
-    return _x64dbg.ReadDword(addr)
-
-def WriteDword(addr, data):
-    return _x64dbg.WriteDword(addr, data)
-
-
-# Register
 def GetEAX():
     return _x64dbg.GetEAX()
 
@@ -90,4 +55,4 @@ def GetEIP():
 def SetEIP(value):
     return _x64dbg.SetEIP(value)
 
-# TODO: Add All Memory Functions, Add x64 Register Functions
+# TODO: Add All Register Functions
