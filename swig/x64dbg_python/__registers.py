@@ -12,7 +12,7 @@ X86_REGISTERS = (
     'EDX', 'DX', 'DH', 'DL',
     'EDI', 'DI', 'ESI', 'SI',
     'EBP', 'BP', 'ESP', 'SP',
-    'EIP', 'IP',
+    'EIP'
     'CIP',  # Generic EIP/RIP register
 ) + X86_DEBUG_REGISTERS
 
