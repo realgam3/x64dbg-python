@@ -11,5 +11,8 @@ typedef unsigned long duint;
 typedef signed long dsint;
 #endif //_WIN64
 
+// Type Maps
+%pybuffer_string(void* data);
+
 %include "_plugins.i"
 %include "../pluginsdk/_scriptapi.h"

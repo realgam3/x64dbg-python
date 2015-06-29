@@ -67,14 +67,19 @@ static bool cbOpenScriptCommand(int argc, char* argv[])
     return true;
 }
 
-static void cbOpenScriptCallback(CBTYPE cbType, void* info)
+static void cbWinEventCallback(CBTYPE cbType, void* info)
 {
-    PLUG_CB_WINEVENT* callbackInfo = ((PLUG_CB_WINEVENT*)info);
-    switch(callbackInfo->message->message)
+    MSG* msg = ((PLUG_CB_WINEVENT*)info)->message;
+    switch(msg->message)
     {
     case WM_HOTKEY:
-        if(callbackInfo->message->wParam == 1)
+        // Hotkeys
+        switch(msg->wParam)
+        {
+        case 1:
             cbOpenScriptCommand(NULL, NULL);
+            break;
+        }
         break;
     }
 }
@@ -111,7 +116,9 @@ void pySetup()
 {
     _plugin_menuaddentry(hMenu, MENU_OPEN, "&OpenScript...\tALT+F7");
     _plugin_menuaddentry(hMenu, MENU_ABOUT, "&About");
+
     // Set HotKey
     if(RegisterHotKey(hwndDlg, 1, MOD_ALT | MOD_NOREPEAT, VK_F7))
-        _plugin_registercallback(pluginHandle, CB_WINEVENT, cbOpenScriptCallback);
+        _plugin_logputs("[PYTHON] ALT+F7 HetKey Registered To OpenScript!");
+    _plugin_registercallback(pluginHandle, CB_WINEVENT, cbWinEventCallback);
 }

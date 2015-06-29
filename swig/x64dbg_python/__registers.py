@@ -1,4 +1,4 @@
-import sys
+from utils import is_64bit
 from pluginsdk import _scriptapi
 
 
@@ -12,20 +12,34 @@ X86_REGISTERS = (
     'EDX', 'DX', 'DH', 'DL',
     'EDI', 'DI', 'ESI', 'SI',
     'EBP', 'BP', 'ESP', 'SP',
-    'EIP'
+    'EIP',
     'CIP',  # Generic EIP/RIP register
 ) + X86_DEBUG_REGISTERS
 
+X64_REGISTERS = (
+    'RAX', 'RBX', 'RCX', 'RDX',
+    'RSI', 'SIL', 'RDI', 'DIL',
+    'RBP', 'BPL', 'RSP', 'SPL', 'RIP',
+    'R8', 'R8D', 'R8W', 'R8B',
+    'R9', 'R9D', 'R9W', 'R9B',
+    'R10', 'R10D', 'R10W', 'R10B',
+    'R11', 'R11D', 'R11W', 'R11B',
+    'R12', 'R12D', 'R12W', 'R12B',
+    'R13', 'R13D', 'R13W', 'R13B',
+    'R14', 'R14D', 'R14W', 'R14B',
+    'R15', 'R15D', 'R15W', 'R15B',
+) + X86_REGISTERS
 
-def is_64bit():
-    return sys.maxsize > 2**32
-
+REGISTERS = X64_REGISTERS if is_64bit() else X86_REGISTERS
 
 class Register(object):
-    def __get_reg_function(self, register, get=True):
+    @staticmethod
+    def __get_reg_function(register, get=True):
         register_name = register.upper()
-        if not is_64bit() and register_name not in X86_REGISTERS:
-            raise Exception("Not an x86 register.")
+        if register_name not in REGISTERS:
+            raise Exception("'{reg}' is not a valid {platform} register.".format(
+                reg=register_name, platform='x64' if is_64bit() else 'x86'
+            ))
 
         return getattr(
             _scriptapi,
