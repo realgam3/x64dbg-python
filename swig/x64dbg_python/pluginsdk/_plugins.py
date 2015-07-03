@@ -1,4 +1,4 @@
-import _x64dbg
+from . import _x64dbg
 
 
 def _plugin_logprintf(text='', *args):

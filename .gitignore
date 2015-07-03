@@ -7,6 +7,7 @@ x64/
 *.suo
 *.layout
 *.depend
+*.pyc
 ipch/
 .idea
 swig/build/

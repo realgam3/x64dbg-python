@@ -1,5 +1,5 @@
 import ctypes
-import _x64dbg
+from . import _x64dbg
 # from ..utils import is_64bit
 
 

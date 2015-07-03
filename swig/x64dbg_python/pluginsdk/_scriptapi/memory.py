@@ -3,15 +3,13 @@ from .. import _x64dbg
 
 
 def Read(addr, size):
-    # Todo: Add ReadSize
     read_bytes = bytearray(size)
-    result = _x64dbg.Read(addr, read_bytes, size, None)
-    if result:
-        return read_bytes
+    result, read_size = _x64dbg.Read(addr, read_bytes, size)
+    return bytes(read_bytes[:read_size])
 
 def Write(addr, data):
-    # Todo: Fix Write Function From Swig
-    return _x64dbg.Write(addr, data, len(data), None)
+    result, write_size = _x64dbg.Write(addr, data, len(data))
+    return result
 
 def ReadByte(addr):
     return _x64dbg.ReadByte(addr)
