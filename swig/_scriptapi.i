@@ -29,6 +29,9 @@
 %apply duint *OUTPUT { duint *sizeWritten };
 %pybuffer_binary(parm, size_parm)
 
+%rename(Memory_Read) Script::Memory::Read;
+%rename(Memory_Write) Script::Memory::Write;
+
 %include "..\pluginsdk\_scriptapi_memory.h"
 
 %include "..\pluginsdk\_scriptapi_register.h"
@@ -53,15 +56,6 @@
 %rename(Stack_SelectionSet) Script::Gui::Stack::SelectionSet;
 %rename(Stack_SelectionGetStart) Script::Gui::Stack::SelectionGetStart;
 %rename(Stack_SelectionGetEnd) Script::Gui::Stack::SelectionGetEnd;
-
-#ifdef _WIN64
-typedef unsigned long long duint;
-typedef signed long long dsint;
-%typemap(in) duint=unsigned long long, dsint=signed long long;
-#else
-typedef unsigned long duint;
-typedef signed long dsint;
-#endif //_WIN64
 
 %apply duint *OUTPUT { duint *start };
 %apply duint *OUTPUT { duint *end };

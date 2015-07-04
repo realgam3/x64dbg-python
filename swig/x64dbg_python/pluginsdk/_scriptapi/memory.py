@@ -4,11 +4,11 @@ from .. import _x64dbg
 
 def Read(addr, size):
     read_bytes = bytearray(size)
-    result, read_size = _x64dbg.Read(addr, read_bytes, size)
+    result, read_size = _x64dbg.Memory_Read(addr, read_bytes, size)
     return bytes(read_bytes[:read_size])
 
 def Write(addr, data):
-    result, write_size = _x64dbg.Write(addr, data, len(data))
+    result, write_size = _x64dbg.Memory_Write(addr, data, len(data))
     return result
 
 def ReadByte(addr):
