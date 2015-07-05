@@ -18,6 +18,7 @@ setup(
         'x64dbg_python.pluginsdk',
         'x64dbg_python.pluginsdk._scriptapi',
     ],
+    package_data={'x64dbg_python': ['autorun/*']},
     ext_modules=[Extension(
         r'x64dbg_python.pluginsdk.__x64dbg', [r'x64dbg_python\pluginsdk\__x64dbg.cpp'],
         language='c++',
@@ -25,5 +26,5 @@ setup(
         library_dirs=[r'..\pluginsdk'],
         libraries=['x64bridge', 'x64dbg'] if is_64bit() else ['x32bridge', 'x32dbg'],
         extra_compile_args=['/EHsc'],
-    )]
+    )],
 )
