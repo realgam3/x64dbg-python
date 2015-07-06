@@ -16,6 +16,9 @@ extern int hMenuDisasm;
 extern int hMenuDump;
 extern int hMenuStack;
 
+#define plugin_name "x64dbg-python"
+#define plugin_version 1
+
 #ifdef __cplusplus
 extern "C"
 {

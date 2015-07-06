@@ -1,5 +1,4 @@
 #include "py.h"
-#include "pluginmain.h"
 #include <windows.h>
 #include <stdio.h>
 #include <psapi.h>
@@ -12,7 +11,6 @@
 #define event_object_name "Event"
 #define autorun_directory "plugins\\" module_name "\\autorun"
 
-
 PyObject* pModule, *pEventObject;
 
 extern "C" __declspec(dllexport) void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info)
@@ -24,7 +22,7 @@ extern "C" __declspec(dllexport) void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENT
         break;
 
     case MENU_ABOUT:
-        MessageBoxA(hwndDlg, "Made By RealGame(Tomer Zait)", "x64dbg-python Plugin", MB_ICONINFORMATION);
+        MessageBoxA(hwndDlg, "Made By RealGame(Tomer Zait)", plugin_name " Plugin", MB_ICONINFORMATION);
         break;
     }
 }
@@ -78,7 +76,7 @@ static bool ExecutePythonScript(char* szFileName)
     return true;
 }
 
-//OpenScript [EntryPointVA]
+// OpenScript [EntryPointVA]
 static bool cbOpenScriptCommand(int argc, char* argv[])
 {
     char szFileName[MAX_PATH] = "";
@@ -105,31 +103,7 @@ static void cbWinEventCallback(CBTYPE cbType, void* info)
     }
 }
 
-//static void cbInitDebugEventCallback(CBTYPE cbType, void* info)
-//{
-//  PyObject *pFunc;
-//  PyObject *szFileName, *pArgs, *pValue;
-//
-//  // Check if event object exist.
-//  if (pEventObject == NULL)
-//      return;
-//
-//  szFileName = PyString_FromString(((PLUG_CB_INITDEBUG*)info)->szFileName);
-//  pFunc = PyObject_GetAttrString(pEventObject, "init_debug");
-//  if (pFunc && PyCallable_Check(pFunc))
-//  {
-//      pArgs = PyTuple_New(1);
-//      PyTuple_SetItem(pArgs, 0, szFileName);
-//      pValue = PyObject_CallObject(pFunc, pArgs);
-//      Py_DECREF(szFileName);
-//      Py_DECREF(pArgs);
-//      Py_DECREF(pFunc);
-//      return;
-//  }
-//  _plugin_logputs("[PYTHON] Could not use init_debug function.");
-//}
-
-static void cbInitDebugEventCallback(CBTYPE cbType, void* info)
+static void cbInitDebugCallback(CBTYPE cbType, void* info)
 {
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
@@ -154,6 +128,37 @@ static void cbInitDebugEventCallback(CBTYPE cbType, void* info)
     }
 }
 
+static void cbBreakPointCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pArgs, *pValue;
+    BRIDGEBP* breakpoint = ((PLUG_CB_BREAKPOINT*)info)->breakpoint;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "breakpoint");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pArgs = PyTuple_New(8);
+        PyTuple_SetItem(pArgs, 0, PyBool_FromLong(breakpoint->active));
+        PyTuple_SetItem(pArgs, 1, PyInt_FromSize_t(breakpoint->addr));
+        PyTuple_SetItem(pArgs, 2, PyBool_FromLong(breakpoint->enabled));
+        PyTuple_SetItem(pArgs, 3, PyString_FromString(breakpoint->mod));
+        PyTuple_SetItem(pArgs, 4, PyString_FromString(breakpoint->name));
+        PyTuple_SetItem(pArgs, 5, PyBool_FromLong(breakpoint->singleshoot));
+        PyTuple_SetItem(pArgs, 6, PyInt_FromLong(breakpoint->slot));
+        PyTuple_SetItem(pArgs, 7, PyInt_FromLong(breakpoint->type));
+        pValue = PyObject_CallObject(pFunc, pArgs);
+        Py_DECREF(pArgs);
+        Py_DECREF(pFunc);
+        Py_DECREF(pValue);
+        return;
+    }
+    _plugin_logputs("[PYTHON] Could not use breakpoint function.");
+}
+
 void pyInit(PLUG_INITSTRUCT* initStruct)
 {
     _plugin_logprintf("[PYTHON] pluginHandle: %d\n", pluginHandle);
@@ -176,7 +181,7 @@ void pyInit(PLUG_INITSTRUCT* initStruct)
             _plugin_logputs("[PYTHON] Could not find Event object.");
     }
     else
-        _plugin_logputs("[PYTHON] Could not import x64dbg_python.");
+        _plugin_logputs("[PYTHON] Could not import " module_name ".");
 
     PyRun_SimpleString("from " module_name " import *\n");
 }
@@ -185,12 +190,15 @@ void pyStop()
 {
     _plugin_unregistercommand(pluginHandle, "Python");
     _plugin_unregistercommand(pluginHandle, "OpenScript");
+
     _plugin_menuclear(hMenu);
     _plugin_menuclear(hMenuDisasm);
     _plugin_menuclear(hMenuDump);
     _plugin_menuclear(hMenuStack);
+
     _plugin_unregistercallback(pluginHandle, CB_WINEVENT);
     _plugin_unregistercallback(pluginHandle, CB_INITDEBUG);
+    _plugin_unregistercallback(pluginHandle, CB_BREAKPOINT);
 
     // Properly ends the python environment
     Py_Finalize();
@@ -204,6 +212,9 @@ void pySetup()
     // Set HotKey
     if(RegisterHotKey(hwndDlg, 1, MOD_ALT | MOD_NOREPEAT, VK_F7))
         _plugin_logputs("[PYTHON] ALT+F7 HetKey Registered To OpenScript!");
+
+    // Set Callbacks
     _plugin_registercallback(pluginHandle, CB_WINEVENT, cbWinEventCallback);
-    _plugin_registercallback(pluginHandle, CB_INITDEBUG, cbInitDebugEventCallback);
+    _plugin_registercallback(pluginHandle, CB_INITDEBUG, cbInitDebugCallback);
+    _plugin_registercallback(pluginHandle, CB_BREAKPOINT, cbBreakPointCallback);
 }

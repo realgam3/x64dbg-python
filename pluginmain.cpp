@@ -1,9 +1,6 @@
 #include "pluginmain.h"
 #include "py.h"
 
-#define plugin_name "x64dbg-python"
-#define plugin_version 1
-
 int pluginHandle;
 HWND hwndDlg;
 int hMenu;
