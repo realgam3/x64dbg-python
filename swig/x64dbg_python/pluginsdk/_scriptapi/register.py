@@ -2,6 +2,10 @@ from x64dbg_python.utils import is_64bit
 from .. import _x64dbg
 
 
+def Size():
+    return _x64dbg.Size()
+
+
 # x86 Registers
 def GetEAX():
     return _x64dbg.GetEAX()

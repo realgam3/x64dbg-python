@@ -7,6 +7,9 @@
 #include "_scriptapi_register.h"
 #include "_scriptapi_pattern.h"
 #include "_scriptapi_gui.h"
+#include "_scriptapi_misc.h"
+#include "_scriptapi_stack.h"
+#include "_scriptapi_assembler.h"
 %}
 
 %include <windows.i>
@@ -61,3 +64,7 @@
 %apply duint *OUTPUT { duint *end };
 
 %include "..\pluginsdk\_scriptapi_gui.h"
+
+%include "..\pluginsdk\_scriptapi_misc.h"
+%include "..\pluginsdk\_scriptapi_stack.h"
+%include "..\pluginsdk\_scriptapi_assembler.h"

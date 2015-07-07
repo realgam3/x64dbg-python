@@ -14,7 +14,7 @@ def Write(addr, data):
 def IsValidPtr(addr):
     return _x64dbg.IsValidPtr(addr)
 
-def RemoteAlloc(addr, size):
+def RemoteAlloc(size, addr=0):
     return _x64dbg.RemoteAlloc(addr, size)
 
 def RemoteFree(addr):

@@ -107,7 +107,7 @@ static void cbWinEventCallback(CBTYPE cbType, void* info)
 
 static void cbInitDebugCallback(CBTYPE cbType, void* info)
 {
-    WIN32_FIND_DATA FindFileData;
+    WIN32_FIND_DATAW FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
     wchar_t autorunDirectory[MAX_PATH], currentDirectory[MAX_PATH];
 
