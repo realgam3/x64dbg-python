@@ -1,20 +1,19 @@
 import functools
-import types
 
 EVENTS = [
     'breakpoint',
+    'stop_debug',
 ]
 
 class Event(object):
     def __init__(self):
         self.breakpoint = None
+        self.stop_debug = None
 
     def listen(self, event_name, callback):
         event_name_lower = event_name.lower()
         if event_name_lower not in EVENTS:
             raise Exception("%s Is not a valid event." % event_name_lower)
-        if not isinstance(callback, types.FunctionType):
-            raise Exception("Invalid callback function.")
 
         _function = getattr(self, "_" + event_name_lower)
         setattr(self, event_name_lower, functools.partial(_function, callback=callback))
@@ -42,3 +41,6 @@ class Event(object):
         } BPXTYPE;
         """
         callback(type, addr, enabled, singleshoot, active, name, mod, slot)
+
+    def _stop_debug(self, callback=None):
+        callback()

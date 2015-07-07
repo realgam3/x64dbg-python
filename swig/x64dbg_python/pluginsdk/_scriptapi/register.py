@@ -153,12 +153,6 @@ def GetEIP():
 def SetEIP(value):
     return _x64dbg.SetEIP(value)
 
-def GetCIP():
-    return _x64dbg.GetCIP()
-
-def SetCIP(value):
-    return _x64dbg.SetCIP(value)
-
 
 # x86 Debug Registers
 def GetDR0():
@@ -469,3 +463,17 @@ if is_64bit():
 
     def SetR15B(value):
         return _x64dbg.SetR15B(value)
+
+
+# Generic Registers
+def GetCIP():
+    return _x64dbg.GetCIP()
+
+def SetCIP(value):
+    return _x64dbg.SetCIP(value)
+
+def GetCSP():
+    return _x64dbg.GetCSP()
+
+def SetCSP(value):
+    return _x64dbg.SetCSP(value)

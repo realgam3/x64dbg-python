@@ -109,25 +109,32 @@ static void cbInitDebugCallback(CBTYPE cbType, void* info)
 {
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
-    wchar_t autorunDirectory[MAX_PATH], temp[MAX_PATH];
+    wchar_t autorunDirectory[MAX_PATH], currentDirectory[MAX_PATH];
 
     // Get Autorun Folder Path
     GetModuleFileNameW(NULL, autorunDirectory, MAX_PATH);
     PathRemoveFileSpecW(autorunDirectory);
     PathAppendW(autorunDirectory, autorun_directory);
 
+    // Get Current Directory
+    GetCurrentDirectoryW(MAX_PATH, currentDirectory);
+
     // Find And Execute *.py Files
-    hFind = FindFirstFileW(PathCombineW(temp, autorunDirectory, L"*.py"), &FindFileData);
+    SetCurrentDirectoryW(autorunDirectory);
+    hFind = FindFirstFileW(L"*.py", &FindFileData);
     if(hFind != INVALID_HANDLE_VALUE)
     {
         do
         {
             _plugin_logprintf("[PYTHON] Executing autorun file: '%ws'.\n", FindFileData.cFileName);
-            ExecutePythonScript(PathCombineW(temp, autorunDirectory, FindFileData.cFileName));
+            ExecutePythonScript(FindFileData.cFileName);
         }
         while(FindNextFileW(hFind, &FindFileData) != 0);
         FindClose(hFind);
     }
+
+    // Reset Current Directory
+    SetCurrentDirectoryW(currentDirectory);
 }
 
 static void cbBreakPointCallback(CBTYPE cbType, void* info)
@@ -152,13 +159,41 @@ static void cbBreakPointCallback(CBTYPE cbType, void* info)
         PyTuple_SetItem(pArgs, 5, PyBool_FromLong(breakpoint->singleshoot));
         PyTuple_SetItem(pArgs, 6, PyInt_FromLong(breakpoint->slot));
         PyTuple_SetItem(pArgs, 7, PyInt_FromLong(breakpoint->type));
+
         pValue = PyObject_CallObject(pFunc, pArgs);
         Py_DECREF(pArgs);
         Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use breakpoint function.");
+            return;
+        }
+
         Py_DECREF(pValue);
-        return;
     }
-    _plugin_logputs("[PYTHON] Could not use breakpoint function.");
+}
+
+static void cbStopDebugCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pArgs, *pValue;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "stop_debug");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pValue = PyObject_CallObject(pFunc, NULL);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use stop_debug function.");
+            return;
+        }
+        Py_DECREF(pValue);
+    }
 }
 
 void pyInit(PLUG_INITSTRUCT* initStruct)
@@ -201,6 +236,7 @@ void pyStop()
     _plugin_unregistercallback(pluginHandle, CB_WINEVENT);
     _plugin_unregistercallback(pluginHandle, CB_INITDEBUG);
     _plugin_unregistercallback(pluginHandle, CB_BREAKPOINT);
+    _plugin_unregistercallback(pluginHandle, CB_STOPDEBUG);
 
     // Properly ends the python environment
     Py_Finalize();
@@ -219,4 +255,5 @@ void pySetup()
     _plugin_registercallback(pluginHandle, CB_WINEVENT, cbWinEventCallback);
     _plugin_registercallback(pluginHandle, CB_INITDEBUG, cbInitDebugCallback);
     _plugin_registercallback(pluginHandle, CB_BREAKPOINT, cbBreakPointCallback);
+    _plugin_registercallback(pluginHandle, CB_STOPDEBUG, cbStopDebugCallback);
 }

@@ -13,7 +13,6 @@ X86_REGISTERS = (
     'EDI', 'DI', 'ESI', 'SI',
     'EBP', 'BP', 'ESP', 'SP',
     'EIP',
-    'CIP',  # Generic EIP/RIP register
 ) + X86_DEBUG_REGISTERS
 
 X64_REGISTERS = (
@@ -30,7 +29,12 @@ X64_REGISTERS = (
     'R15', 'R15D', 'R15W', 'R15B',
 ) + X86_REGISTERS
 
-REGISTERS = X64_REGISTERS if is_64bit() else X86_REGISTERS
+GEN_REGISTERS = (
+    'CIP',  # Generic EIP/RIP register
+    'CSP'   # Generic ESP/RSP register
+)
+
+REGISTERS = (X64_REGISTERS if is_64bit() else X86_REGISTERS) + GEN_REGISTERS
 
 class Register(object):
     @staticmethod

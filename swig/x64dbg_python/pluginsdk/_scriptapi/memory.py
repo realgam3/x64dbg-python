@@ -11,6 +11,16 @@ def Write(addr, data):
     result, write_size = _x64dbg.Memory_Write(addr, data, len(data))
     return result
 
+def IsValidPtr(addr):
+    return _x64dbg.IsValidPtr(addr)
+
+def RemoteAlloc(addr, size):
+    return _x64dbg.RemoteAlloc(addr, size)
+
+def RemoteFree(addr):
+    return _x64dbg.RemoteFree(addr)
+
+
 def ReadByte(addr):
     return _x64dbg.ReadByte(addr)
 
