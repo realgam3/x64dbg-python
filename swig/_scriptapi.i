@@ -67,4 +67,10 @@
 
 %include "..\pluginsdk\_scriptapi_misc.h"
 %include "..\pluginsdk\_scriptapi_stack.h"
+
+// Type Maps
+%pybuffer_string(char* error);
+%pybuffer_string(dest)
+%apply int *OUTPUT { int *size };
+
 %include "..\pluginsdk\_scriptapi_assembler.h"

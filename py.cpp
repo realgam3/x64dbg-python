@@ -79,13 +79,19 @@ static bool ExecutePythonScript(wchar_t* szFileName)
 }
 
 // OpenScript [EntryPointVA]
-static bool cbOpenScriptCommand(int argc, char* argv[])
+static void OpenScript()
 {
     wchar_t szFileName[MAX_PATH] = {0};
     if(!OpenFileDialog(szFileName))
-        return false;
+        return;
 
-    return ExecutePythonScript(szFileName);
+    ExecutePythonScript(szFileName);
+}
+
+static bool cbOpenScriptCommand(int argc, char* argv[])
+{
+    _plugin_startscript(OpenScript);
+    return true;
 }
 
 static void cbWinEventCallback(CBTYPE cbType, void* info)
@@ -98,7 +104,7 @@ static void cbWinEventCallback(CBTYPE cbType, void* info)
         switch(msg->wParam)
         {
         case 1:
-            cbOpenScriptCommand(NULL, NULL);
+            _plugin_startscript(OpenScript);
             break;
         }
         break;
