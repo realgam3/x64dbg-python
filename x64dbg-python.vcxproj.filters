@@ -51,6 +51,9 @@
     <ClCompile Include="py.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stringutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pluginmain.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="pluginsdk\capstone\platform.h">
       <Filter>Header Files\pluginsdk\capstone</Filter>
+    </ClInclude>
+    <ClInclude Include="stringutils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

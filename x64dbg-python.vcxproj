@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="pluginmain.cpp" />
     <ClCompile Include="py.cpp" />
+    <ClCompile Include="stringutils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pluginmain.h" />
@@ -78,6 +79,14 @@
     <ClInclude Include="pluginsdk\_scriptapi_pattern.h" />
     <ClInclude Include="pluginsdk\_scriptapi_register.h" />
     <ClInclude Include="py.h" />
+    <ClInclude Include="stringutils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
@@ -87,6 +96,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>

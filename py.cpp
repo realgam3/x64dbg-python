@@ -1,4 +1,5 @@
 #include "py.h"
+#include "stringutils.h"
 #include <windows.h>
 #include <stdio.h>
 #include <psapi.h>
@@ -9,7 +10,7 @@
 
 #define module_name "x64dbg_python"
 #define event_object_name "Event"
-#define autorun_directory "plugins\\" module_name "\\autorun"
+#define autorun_directory L"plugins\\x64dbg_python\\autorun"
 
 PyObject* pModule, *pEventObject;
 
@@ -38,11 +39,11 @@ static bool cbPythonCommand(int argc, char* argv[])
     return true;
 }
 
-static bool OpenFileDialog(char Buffer[MAX_PATH])
+static bool OpenFileDialog(wchar_t Buffer[MAX_PATH])
 {
-    OPENFILENAMEA sOpenFileName = {0};
-    const char szFilterString[] = "Python files\0*.py\0\0";
-    const char szDialogTitle[] = "Select script file...";
+    OPENFILENAMEW sOpenFileName = {0};
+    const wchar_t szFilterString[] = L"Python files\0*.py\0\0";
+    const wchar_t szDialogTitle[] = L"Select script file...";
     sOpenFileName.lStructSize = sizeof(sOpenFileName);
     sOpenFileName.lpstrFilter = szFilterString;
     sOpenFileName.nFilterIndex = 1;
@@ -51,20 +52,21 @@ static bool OpenFileDialog(char Buffer[MAX_PATH])
     sOpenFileName.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
     sOpenFileName.lpstrTitle = szDialogTitle;
     sOpenFileName.hwndOwner = GuiGetWindowHandle();
-    return (FALSE != GetOpenFileNameA(&sOpenFileName));
+    return (FALSE != GetOpenFileNameW(&sOpenFileName));
 }
 
-static bool ExecutePythonScript(char* szFileName)
+static bool ExecutePythonScript(wchar_t* szFileName)
 {
     int status_code;
-    PyObject* PyFileObject = PyFile_FromString(szFileName, "r");
+    String szFileNameA = Utf16ToUtf8(szFileName);
+    PyObject* PyFileObject = PyFile_FromString((char*)szFileNameA.c_str(), "r");
     if(PyFileObject == NULL)
     {
         _plugin_logputs("[PYTHON] Could not open file....");
         return false;
     }
 
-    status_code = PyRun_SimpleFile(PyFile_AsFile(PyFileObject), szFileName);
+    status_code = PyRun_SimpleFile(PyFile_AsFile(PyFileObject), (char*)szFileNameA.c_str());
     Py_DECREF(PyFileObject);
     if(status_code != EXIT_SUCCESS)
     {
@@ -79,7 +81,7 @@ static bool ExecutePythonScript(char* szFileName)
 // OpenScript [EntryPointVA]
 static bool cbOpenScriptCommand(int argc, char* argv[])
 {
-    char szFileName[MAX_PATH] = "";
+    wchar_t szFileName[MAX_PATH] = {0};
     if(!OpenFileDialog(szFileName))
         return false;
 
@@ -107,23 +109,23 @@ static void cbInitDebugCallback(CBTYPE cbType, void* info)
 {
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind = INVALID_HANDLE_VALUE;
-    char autorunDirectory[MAX_PATH], temp[MAX_PATH];
+    wchar_t autorunDirectory[MAX_PATH], temp[MAX_PATH];
 
     // Get Autorun Folder Path
-    GetModuleFileNameA(NULL, autorunDirectory, MAX_PATH);
-    PathRemoveFileSpecA(autorunDirectory);
-    PathAppendA(autorunDirectory, autorun_directory);
+    GetModuleFileNameW(NULL, autorunDirectory, MAX_PATH);
+    PathRemoveFileSpecW(autorunDirectory);
+    PathAppendW(autorunDirectory, autorun_directory);
 
     // Find And Execute *.py Files
-    hFind = FindFirstFile(PathCombineA(temp, autorunDirectory, "*.py"), &FindFileData);
+    hFind = FindFirstFileW(PathCombineW(temp, autorunDirectory, L"*.py"), &FindFileData);
     if(hFind != INVALID_HANDLE_VALUE)
     {
         do
         {
-            _plugin_logprintf("[PYTHON] Executing autorun file: '%s'.\n", FindFileData.cFileName);
-            ExecutePythonScript(PathCombineA(temp, autorunDirectory, FindFileData.cFileName));
+            _plugin_logprintf("[PYTHON] Executing autorun file: '%ws'.\n", FindFileData.cFileName);
+            ExecutePythonScript(PathCombineW(temp, autorunDirectory, FindFileData.cFileName));
         }
-        while(FindNextFile(hFind, &FindFileData) != 0);
+        while(FindNextFileW(hFind, &FindFileData) != 0);
         FindClose(hFind);
     }
 }
