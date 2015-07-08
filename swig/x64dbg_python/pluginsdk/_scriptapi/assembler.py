@@ -3,28 +3,29 @@ from .. import _x64dbg
 
 
 MAX_ERROR_SIZE = 512
+MAX_STRING = 512
 
 
-def Assemble(addr, instruction):
-    byte_array = bytearray()
-    result, size = _x64dbg.Assemble(addr, byte_array, instruction)
+def Assemble(instruction, addr=0):
+    dest = ctypes.create_string_buffer(MAX_STRING)
+    result, size = _x64dbg.Assemble(addr, dest, instruction)
     if result:
-        return byte_array[:size]
+        return dest[:size].encode('hex')
 
-def AssembleEx(addr, instruction):
+def AssembleEx(instruction, addr=0):
     error = ctypes.create_string_buffer(MAX_ERROR_SIZE)
-    byte_array = bytearray()
-    result, size = _x64dbg.AssembleEx(addr, byte_array, instruction, error)
+    dest = ctypes.create_string_buffer(MAX_STRING)
+    result, size = _x64dbg.AssembleEx(addr, dest, instruction, error)
     if not result:
-        raise Exception(error)
-    return byte_array[:size]
+        raise Exception(error.value)
+    return dest[:size].encode('hex')
 
-def AssembleMem(addr, instruction):
+def AssembleMem(instruction, addr):
     return _x64dbg.AssembleMem(addr, instruction)
 
-def AssembleMemEx(addr, instruction, fillnop):
+def AssembleMemEx(instruction, fillnop, addr):
     error = ctypes.create_string_buffer(MAX_ERROR_SIZE)
     result, size = _x64dbg.AssembleMemEx(addr, instruction, error, fillnop)
     if not result:
-        raise Exception(error)
-    return result[:size]
+        raise Exception(error.value)
+    return result
