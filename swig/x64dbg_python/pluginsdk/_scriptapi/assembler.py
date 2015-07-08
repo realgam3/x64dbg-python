@@ -6,13 +6,13 @@ MAX_ERROR_SIZE = 512
 MAX_STRING = 512
 
 
-def Assemble(instruction, addr=0):
+def Assemble(addr, instruction):
     dest = ctypes.create_string_buffer(MAX_STRING)
     result, size = _x64dbg.Assemble(addr, dest, instruction)
     if result:
         return dest[:size].encode('hex')
 
-def AssembleEx(instruction, addr=0):
+def AssembleEx(addr, instruction):
     error = ctypes.create_string_buffer(MAX_ERROR_SIZE)
     dest = ctypes.create_string_buffer(MAX_STRING)
     result, size = _x64dbg.AssembleEx(addr, dest, instruction, error)
@@ -20,10 +20,10 @@ def AssembleEx(instruction, addr=0):
         raise Exception(error.value)
     return dest[:size].encode('hex')
 
-def AssembleMem(instruction, addr):
+def AssembleMem(addr, instruction):
     return _x64dbg.AssembleMem(addr, instruction)
 
-def AssembleMemEx(instruction, fillnop, addr):
+def AssembleMemEx(addr, instruction, fillnop):
     error = ctypes.create_string_buffer(MAX_ERROR_SIZE)
     result, size = _x64dbg.AssembleMemEx(addr, instruction, error, fillnop)
     if not result:
