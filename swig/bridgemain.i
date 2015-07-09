@@ -177,3 +177,4 @@ BRIDGE_IMPEXP void GuiLoadSourceFile(const char* path, int line);
 BRIDGE_IMPEXP void GuiMenuSetIcon(int hMenu, const ICONDATA* icon);
 BRIDGE_IMPEXP void GuiMenuSetEntryIcon(int hEntry, const ICONDATA* icon);
 BRIDGE_IMPEXP void GuiShowCpu();
+BRIDGE_IMPEXP void GuiExecuteOnGuiThread(GUICALLBACK cbGuiThread);

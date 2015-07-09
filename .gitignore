@@ -14,3 +14,4 @@ swig/build/
 swig/x64dbg_python/pluginsdk/__x64dbg.cpp
 swig/x64dbg_python/pluginsdk/_x64dbg.py
 swig/compile*.bat
+swig/x64dbg_python/autorun/*.py
