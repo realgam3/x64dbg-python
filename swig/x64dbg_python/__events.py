@@ -4,6 +4,7 @@ EVENTS = [
     'stop_debug',
     'create_process',
     'exit_process',
+    'create_thread',
 ]
 
 class Event(object):
@@ -45,6 +46,13 @@ class Event(object):
         #   DWORD dwExitCode;
         # } EXIT_PROCESS_DEBUG_INFO, *LPEXIT_PROCESS_DEBUG_INFO;
         self.exit_process = None
+        # Keys: CreateThread, dwThreadId
+        # typedef struct
+        # {
+        #     CREATE_THREAD_DEBUG_INFO* CreateThread;
+        #     DWORD dwThreadId;
+        # } PLUG_CB_CREATETHREAD;
+        self.create_thread = None
 
     def listen(self, event_name, callback):
         """

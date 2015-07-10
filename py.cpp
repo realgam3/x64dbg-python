@@ -160,10 +160,52 @@ static void cbInitDebugCallback(CBTYPE cbType, void* info)
     SetCurrentDirectoryW(currentDirectory);
 }
 
+static void cbCreateThreadCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pCreateThread, *pKwargs, *pValue;
+
+    PLUG_CB_CREATETHREAD* callbackInfo = (PLUG_CB_CREATETHREAD*)info;
+    CREATE_THREAD_DEBUG_INFO* CreateThread = callbackInfo->CreateThread;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "create_thread");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pCreateThread = Py_BuildValue(
+                            "{s:k, s:N, s:N}",
+                            "hThread", CreateThread->hThread,
+                            "lpThreadLocalBase", PyInt_FromSize_t((size_t)CreateThread->lpThreadLocalBase),
+                            "lpStartAddress", PyInt_FromSize_t((size_t)CreateThread->lpThreadLocalBase)
+                        );
+        pKwargs = Py_BuildValue(
+                      "{s:k, s:N}",
+                      "dwThreadId", callbackInfo->dwThreadId,
+                      "CreateThread", pCreateThread
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pCreateThread);
+        Py_DECREF(pKwargs);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use exit_process function.");
+            printPyErr();
+            return;
+        }
+
+        Py_DECREF(pValue);
+    }
+}
+
 static void cbExitProcessCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
     PyObject* pKwargs, *pValue;
+
     EXIT_PROCESS_DEBUG_INFO* ExitProcess = ((PLUG_CB_EXITPROCESS*)info)->ExitProcess;
 
     // Check if event object exist.
@@ -195,6 +237,7 @@ static void cbCreateProcessCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
     PyObject* pCreateProcessInfo, *pPdbSig70, *pModInfo, *pFdProcessInfo, *pKwargs, *pValue;
+
     PLUG_CB_CREATEPROCESS* callbackInfo = (PLUG_CB_CREATEPROCESS*)info;
     CREATE_PROCESS_DEBUG_INFO* CreateProcessInfo = callbackInfo->CreateProcessInfo;
     IMAGEHLP_MODULE64* modInfo = callbackInfo->modInfo;
@@ -293,6 +336,7 @@ static void cbBreakPointCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
     PyObject* pKwargs, *pValue;
+
     BRIDGEBP* breakpoint = ((PLUG_CB_BREAKPOINT*)info)->breakpoint;
 
     // Check if event object exist.
@@ -394,6 +438,7 @@ void pyStop()
     _plugin_unregistercallback(pluginHandle, CB_STOPDEBUG);
     _plugin_unregistercallback(pluginHandle, CB_CREATEPROCESS);
     _plugin_unregistercallback(pluginHandle, CB_EXITPROCESS);
+    _plugin_unregistercallback(pluginHandle, CB_CREATETHREAD);
 
     // Properly ends the python environment
     Py_Finalize();
@@ -415,4 +460,5 @@ void pySetup()
     _plugin_registercallback(pluginHandle, CB_STOPDEBUG, cbStopDebugCallback);
     _plugin_registercallback(pluginHandle, CB_CREATEPROCESS, cbCreateProcessCallback);
     _plugin_registercallback(pluginHandle, CB_EXITPROCESS, cbExitProcessCallback);
+    _plugin_registercallback(pluginHandle, CB_CREATETHREAD, cbCreateThreadCallback);
 }
