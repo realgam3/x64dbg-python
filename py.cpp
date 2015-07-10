@@ -28,6 +28,21 @@ extern "C" __declspec(dllexport) void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENT
     }
 }
 
+void printPyErr()
+{
+    PyObject* ptype, *pvalue, *ptraceback;
+    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+    PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
+
+    _plugin_logprintf("         %-9s: %s.\n", "Type", PyString_AsString(PyObject_Str(ptype)));
+    _plugin_logprintf("         %-9s: %s.\n", "Message", PyString_AsString(PyObject_Str(pvalue)));
+    _plugin_logprintf("         %-9s: %s.\n", "Traceback", PyString_AsString(PyObject_Str(ptraceback)));
+
+    Py_DECREF(ptype);
+    Py_DECREF(pvalue);
+    Py_DECREF(ptraceback);
+}
+
 static bool cbPythonCommand(int argc, char* argv[])
 {
     if(argc < 2)
@@ -62,7 +77,8 @@ static bool ExecutePythonScript(wchar_t* szFileName)
     PyObject* PyFileObject = PyFile_FromString((char*)szFileNameA.c_str(), "r");
     if(PyFileObject == NULL)
     {
-        _plugin_logputs("[PYTHON] Could not open file....");
+        _plugin_logprintf("[PYTHON] Could not open file....");
+        printPyErr();
         return false;
     }
 
@@ -71,6 +87,7 @@ static bool ExecutePythonScript(wchar_t* szFileName)
     if(status_code != EXIT_SUCCESS)
     {
         _plugin_logprintf("[PYTHON] Execution failed (status code: %d)....\n", status_code);
+        printPyErr();
         return false;
     }
 
@@ -143,10 +160,106 @@ static void cbInitDebugCallback(CBTYPE cbType, void* info)
     SetCurrentDirectoryW(currentDirectory);
 }
 
+static void cbCreateProcessCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pCreateProcessInfo, *pPdbSig70, *pModInfo, *pFdProcessInfo, *pKwargs, *pValue;
+    PLUG_CB_CREATEPROCESS* callbackInfo = (PLUG_CB_CREATEPROCESS*)info;
+    CREATE_PROCESS_DEBUG_INFO* CreateProcessInfo = callbackInfo->CreateProcessInfo;
+    IMAGEHLP_MODULE64* modInfo = callbackInfo->modInfo;
+    PROCESS_INFORMATION* fdProcessInfo = callbackInfo->fdProcessInfo;
+    GUID PdbSig70 = modInfo->PdbSig70;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "create_process");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pCreateProcessInfo = Py_BuildValue(
+                                 "{s:N, s:N, s:N, s:N, s:k, s:k, s:N, s:N, s:N, s:H}",
+                                 "hFile", PyInt_FromSize_t((size_t)CreateProcessInfo->hFile),
+                                 "hProcess", PyInt_FromSize_t((size_t)CreateProcessInfo->hProcess),
+                                 "hThread", PyInt_FromSize_t((size_t)CreateProcessInfo->hThread),
+                                 "hThread", PyInt_FromSize_t((size_t)CreateProcessInfo->lpBaseOfImage),
+                                 "dwDebugInfoFileOffset", CreateProcessInfo->dwDebugInfoFileOffset,
+                                 "nDebugInfoSize", CreateProcessInfo->nDebugInfoSize,
+                                 "lpThreadLocalBase", PyInt_FromSize_t((size_t)CreateProcessInfo->lpThreadLocalBase),
+                                 "lpStartAddress", PyInt_FromSize_t((size_t)CreateProcessInfo->lpStartAddress),
+                                 "lpImageName", PyInt_FromSize_t((size_t)CreateProcessInfo->lpImageName),
+                                 "fUnicode", CreateProcessInfo->fUnicode
+                             );
+        pPdbSig70 = Py_BuildValue(
+                        "{s:k, s:H, s:H, s:N}",
+                        "Data1", PdbSig70.Data1,
+                        "Data2", PdbSig70.Data2,
+                        "Data3", PdbSig70.Data3,
+                        "Data4", PyByteArray_FromStringAndSize(
+                            (char*)PdbSig70.Data4, ARRAYSIZE(PdbSig70.Data4)
+                        )
+                    );
+        pModInfo = Py_BuildValue(
+                       "{s:k, s:K, s:k, s:k, s:k, s:k, s:i, s:s, s:s, s:s, s:s, "
+                       " s:k, s:s, s:k, s:N, s:k, s:N, s:N, s:N, s:N, s:N, s:N, s:N}",
+                       "SizeOfStruct", modInfo->SizeOfStruct,
+                       "BaseOfImage", modInfo->BaseOfImage,
+                       "ImageSize", modInfo->TimeDateStamp,
+                       "TimeDateStamp", modInfo->TimeDateStamp,
+                       "CheckSum", modInfo->CheckSum,
+                       "NumSyms", modInfo->NumSyms,
+                       "SymType", modInfo->SymType,
+                       "ModuleName", modInfo->ModuleName,
+                       "ImageName", modInfo->ImageName,
+                       "LoadedImageName", modInfo->LoadedImageName,
+                       "LoadedPdbName", modInfo->LoadedPdbName,
+                       "CVSig", modInfo->CVSig,
+                       "CVData", modInfo->CVData,
+                       "PdbSig", modInfo->PdbSig,
+                       "PdbSig70", pPdbSig70,
+                       "PdbAge", modInfo->PdbAge,
+                       "PdbUnmatched", PyBool_FromLong(modInfo->PdbUnmatched),
+                       "DbgUnmatched", PyBool_FromLong(modInfo->DbgUnmatched),
+                       "LineNumbers", PyBool_FromLong(modInfo->LineNumbers),
+                       "GlobalSymbols", PyBool_FromLong(modInfo->GlobalSymbols),
+                       "TypeInfo", PyBool_FromLong(modInfo->TypeInfo),
+                       "SourceIndexed", PyBool_FromLong(modInfo->SourceIndexed),
+                       "Publics", PyBool_FromLong(modInfo->Publics)
+                   );
+        pFdProcessInfo = Py_BuildValue(
+                             "{s:N, s:N, s:k, s:k}",
+                             "hProcess", PyInt_FromSize_t((size_t)fdProcessInfo->hProcess),
+                             "hThread", PyInt_FromSize_t((size_t)fdProcessInfo->hThread),
+                             "dwProcessId", fdProcessInfo->dwProcessId,
+                             "dwThreadId", fdProcessInfo->dwThreadId
+                         );
+        pKwargs = Py_BuildValue(
+                      "{s:N, s:N, s:s, s:N}",
+                      "CreateProcessInfo", pCreateProcessInfo,
+                      "modInfo", pModInfo,
+                      "DebugFileName", callbackInfo->DebugFileName,
+                      "fdProcessInfo", pFdProcessInfo
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pFdProcessInfo);
+        Py_DECREF(pCreateProcessInfo);
+        Py_DECREF(pKwargs);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use create_process function.");
+            printPyErr();
+            return;
+        }
+
+        Py_DECREF(pValue);
+    }
+}
+
 static void cbBreakPointCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
-    PyObject* pArgs, *pValue;
+    PyObject* pKwargs, *pValue;
     BRIDGEBP* breakpoint = ((PLUG_CB_BREAKPOINT*)info)->breakpoint;
 
     // Check if event object exist.
@@ -156,22 +269,24 @@ static void cbBreakPointCallback(CBTYPE cbType, void* info)
     pFunc = PyObject_GetAttrString(pEventObject, "breakpoint");
     if(pFunc && PyCallable_Check(pFunc))
     {
-        pArgs = PyTuple_New(8);
-        PyTuple_SetItem(pArgs, 0, PyBool_FromLong(breakpoint->active));
-        PyTuple_SetItem(pArgs, 1, PyInt_FromSize_t(breakpoint->addr));
-        PyTuple_SetItem(pArgs, 2, PyBool_FromLong(breakpoint->enabled));
-        PyTuple_SetItem(pArgs, 3, PyString_FromString(breakpoint->mod));
-        PyTuple_SetItem(pArgs, 4, PyString_FromString(breakpoint->name));
-        PyTuple_SetItem(pArgs, 5, PyBool_FromLong(breakpoint->singleshoot));
-        PyTuple_SetItem(pArgs, 6, PyInt_FromLong(breakpoint->slot));
-        PyTuple_SetItem(pArgs, 7, PyInt_FromLong(breakpoint->type));
-
-        pValue = PyObject_CallObject(pFunc, pArgs);
-        Py_DECREF(pArgs);
+        pKwargs = Py_BuildValue(
+                      "{s:i, s:N, s:N, s:N, s:N, s:s, s:s, s:i}",
+                      "type", breakpoint->type,
+                      "addr", PyInt_FromSize_t(breakpoint->addr),
+                      "enabled", PyBool_FromLong(breakpoint->enabled),
+                      "singleshoot", PyBool_FromLong(breakpoint->singleshoot),
+                      "active", PyBool_FromLong(breakpoint->active),
+                      "mod", breakpoint->mod,
+                      "name", breakpoint->name,
+                      "slot", breakpoint->slot
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pKwargs);
         Py_DECREF(pFunc);
         if(pValue == NULL)
         {
             _plugin_logputs("[PYTHON] Could not use breakpoint function.");
+            printPyErr();
             return;
         }
 
@@ -182,7 +297,7 @@ static void cbBreakPointCallback(CBTYPE cbType, void* info)
 static void cbStopDebugCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
-    PyObject* pArgs, *pValue;
+    PyObject* pValue;
 
     // Check if event object exist.
     if(pEventObject == NULL)
@@ -196,6 +311,7 @@ static void cbStopDebugCallback(CBTYPE cbType, void* info)
         if(pValue == NULL)
         {
             _plugin_logputs("[PYTHON] Could not use stop_debug function.");
+            printPyErr();
             return;
         }
         Py_DECREF(pValue);
@@ -262,4 +378,5 @@ void pySetup()
     _plugin_registercallback(pluginHandle, CB_INITDEBUG, cbInitDebugCallback);
     _plugin_registercallback(pluginHandle, CB_BREAKPOINT, cbBreakPointCallback);
     _plugin_registercallback(pluginHandle, CB_STOPDEBUG, cbStopDebugCallback);
+    _plugin_registercallback(pluginHandle, CB_CREATEPROCESS, cbCreateProcessCallback);
 }
