@@ -30,7 +30,7 @@ class Event(object):
         self.breakpoint = None
         # Keys: None
         self.stop_debug = None
-        # Keys:
+        # Keys: CreateProcessInfo, modInfo, DebugFileName, fdProcessInfo
         # typedef struct
         # {
         #     CREATE_PROCESS_DEBUG_INFO* CreateProcessInfo;
