@@ -160,6 +160,37 @@ static void cbInitDebugCallback(CBTYPE cbType, void* info)
     SetCurrentDirectoryW(currentDirectory);
 }
 
+static void cbExitProcessCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pKwargs, *pValue;
+    EXIT_PROCESS_DEBUG_INFO* ExitProcess = ((PLUG_CB_EXITPROCESS*)info)->ExitProcess;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "exit_process");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pKwargs = Py_BuildValue(
+                      "{s:k}",
+                      "dwExitCode", ExitProcess->dwExitCode
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pKwargs);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use exit_process function.");
+            printPyErr();
+            return;
+        }
+
+        Py_DECREF(pValue);
+    }
+}
+
 static void cbCreateProcessCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
@@ -241,8 +272,10 @@ static void cbCreateProcessCallback(CBTYPE cbType, void* info)
                       "fdProcessInfo", pFdProcessInfo
                   );
         pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
-        Py_DECREF(pFdProcessInfo);
         Py_DECREF(pCreateProcessInfo);
+        Py_DECREF(pPdbSig70);
+        Py_DECREF(pModInfo);
+        Py_DECREF(pFdProcessInfo);
         Py_DECREF(pKwargs);
         Py_DECREF(pFunc);
         if(pValue == NULL)
@@ -359,6 +392,8 @@ void pyStop()
     _plugin_unregistercallback(pluginHandle, CB_INITDEBUG);
     _plugin_unregistercallback(pluginHandle, CB_BREAKPOINT);
     _plugin_unregistercallback(pluginHandle, CB_STOPDEBUG);
+    _plugin_unregistercallback(pluginHandle, CB_CREATEPROCESS);
+    _plugin_unregistercallback(pluginHandle, CB_EXITPROCESS);
 
     // Properly ends the python environment
     Py_Finalize();
@@ -379,4 +414,5 @@ void pySetup()
     _plugin_registercallback(pluginHandle, CB_BREAKPOINT, cbBreakPointCallback);
     _plugin_registercallback(pluginHandle, CB_STOPDEBUG, cbStopDebugCallback);
     _plugin_registercallback(pluginHandle, CB_CREATEPROCESS, cbCreateProcessCallback);
+    _plugin_registercallback(pluginHandle, CB_EXITPROCESS, cbExitProcessCallback);
 }

@@ -3,6 +3,7 @@ EVENTS = [
     'breakpoint',
     'stop_debug',
     'create_process',
+    'exit_process',
 ]
 
 class Event(object):
@@ -39,6 +40,11 @@ class Event(object):
         #     PROCESS_INFORMATION* fdProcessInfo;
         # } PLUG_CB_CREATEPROCESS;
         self.create_process = None
+        # Keys: dwExitCode
+        # typedef struct _EXIT_PROCESS_DEBUG_INFO {
+        #   DWORD dwExitCode;
+        # } EXIT_PROCESS_DEBUG_INFO, *LPEXIT_PROCESS_DEBUG_INFO;
+        self.exit_process = None
 
     def listen(self, event_name, callback):
         """
