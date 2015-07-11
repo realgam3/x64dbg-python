@@ -1,5 +1,6 @@
 #include "py.h"
 #include "stringutils.h"
+#include "resource.h"
 #include <windows.h>
 #include <stdio.h>
 #include <psapi.h>
@@ -13,6 +14,7 @@
 #define autorun_directory L"plugins\\x64dbg_python\\autorun"
 
 PyObject* pModule, *pEventObject;
+HINSTANCE hInst;
 
 extern "C" __declspec(dllexport) void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info)
 {
@@ -120,7 +122,7 @@ static void cbWinEventCallback(CBTYPE cbType, void* info)
         // Hotkeys
         switch(msg->wParam)
         {
-        case 1:
+        case MENU_OPEN:
             _plugin_startscript(OpenScript);
             break;
         }
@@ -210,7 +212,7 @@ static void cbLoadDllCallback(CBTYPE cbType, void* info)
     if(pFunc && PyCallable_Check(pFunc))
     {
         pLoadDll = Py_BuildValue(
-                       "{s:N, s:N, s:k, s:k, s:s, s:H}",
+                       "{s:N, s:N, s:k, s:k, s:N, s:H}",
                        "hFile", PyInt_FromSize_t((size_t)LoadDll->hFile),
                        "lpBaseOfDll", PyInt_FromSize_t((size_t)LoadDll->lpBaseOfDll),
                        "dwDebugInfoFileOffset", LoadDll->dwDebugInfoFileOffset,
@@ -624,11 +626,22 @@ void pyStop()
 
 void pySetup()
 {
+    // Set Menu Icon
+    ICONDATA pyIcon;
+    HRSRC hRes = FindResourceW(hInst, MAKEINTRESOURCEW(IDB_PNG1), L"PNG");
+    DWORD size = SizeofResource(hInst, hRes);
+    HGLOBAL hMem = LoadResource(hInst, hRes);
+
+    pyIcon.data = LockResource(hMem);
+    pyIcon.size = size;
+    _plugin_menuseticon(hMenu, &pyIcon);
+
+    FreeResource(hMem);
     _plugin_menuaddentry(hMenu, MENU_OPEN, "&OpenScript...\tALT+F7");
     _plugin_menuaddentry(hMenu, MENU_ABOUT, "&About");
 
     // Set HotKey
-    if(RegisterHotKey(hwndDlg, 1, MOD_ALT | MOD_NOREPEAT, VK_F7))
+    if(RegisterHotKey(hwndDlg, MENU_OPEN, MOD_ALT | MOD_NOREPEAT, VK_F7))
         _plugin_logputs("[PYTHON] ALT+F7 HetKey Registered To OpenScript!");
 
     // Set Callbacks
