@@ -160,6 +160,180 @@ static void cbInitDebugCallback(CBTYPE cbType, void* info)
     SetCurrentDirectoryW(currentDirectory);
 }
 
+static void cbUnloadDllCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pKwargs, *pValue;
+
+    LPUNLOAD_DLL_DEBUG_INFO UnloadDll = ((PLUG_CB_UNLOADDLL*)info)->UnloadDll;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "unload_dll");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pKwargs = Py_BuildValue(
+                      "{s:N}",
+                      "lpBaseOfDll", PyInt_FromSize_t((size_t)UnloadDll->lpBaseOfDll)
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pKwargs);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use unload_dll function.");
+            printPyErr();
+            return;
+        }
+
+        Py_DECREF(pValue);
+    }
+}
+
+static void cbLoadDllCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pLoadDll, *pPdbSig70, *pModInfo, *pKwargs, *pValue;
+
+    PLUG_CB_LOADDLL* callbackInfo = (PLUG_CB_LOADDLL*)info;
+    LOAD_DLL_DEBUG_INFO* LoadDll = callbackInfo->LoadDll;
+    IMAGEHLP_MODULE64* modInfo = callbackInfo->modInfo;
+    GUID PdbSig70 = modInfo->PdbSig70;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "load_dll");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pLoadDll = Py_BuildValue(
+                       "{s:N, s:N, s:k, s:k, s:s, s:H}",
+                       "hFile", PyInt_FromSize_t((size_t)LoadDll->hFile),
+                       "lpBaseOfDll", PyInt_FromSize_t((size_t)LoadDll->lpBaseOfDll),
+                       "dwDebugInfoFileOffset", LoadDll->dwDebugInfoFileOffset,
+                       "nDebugInfoSize", LoadDll->nDebugInfoSize,
+                       "lpImageName", PyInt_FromSize_t((size_t)LoadDll->lpImageName),
+                       "fUnicode", LoadDll->fUnicode
+                   );
+        pPdbSig70 = Py_BuildValue(
+                        "{s:k, s:H, s:H, s:N}",
+                        "Data1", PdbSig70.Data1,
+                        "Data2", PdbSig70.Data2,
+                        "Data3", PdbSig70.Data3,
+                        "Data4", PyByteArray_FromStringAndSize(
+                            (char*)PdbSig70.Data4, ARRAYSIZE(PdbSig70.Data4)
+                        )
+                    );
+        pModInfo = Py_BuildValue(
+                       "{s:k, s:K, s:k, s:k, s:k, s:k, s:i, s:s, s:s, s:s, s:s, "
+                       " s:k, s:s, s:k, s:N, s:k, s:N, s:N, s:N, s:N, s:N, s:N, s:N}",
+                       "SizeOfStruct", modInfo->SizeOfStruct,
+                       "BaseOfImage", modInfo->BaseOfImage,
+                       "ImageSize", modInfo->TimeDateStamp,
+                       "TimeDateStamp", modInfo->TimeDateStamp,
+                       "CheckSum", modInfo->CheckSum,
+                       "NumSyms", modInfo->NumSyms,
+                       "SymType", modInfo->SymType,
+                       "ModuleName", modInfo->ModuleName,
+                       "ImageName", modInfo->ImageName,
+                       "LoadedImageName", modInfo->LoadedImageName,
+                       "LoadedPdbName", modInfo->LoadedPdbName,
+                       "CVSig", modInfo->CVSig,
+                       "CVData", modInfo->CVData,
+                       "PdbSig", modInfo->PdbSig,
+                       "PdbSig70", pPdbSig70,
+                       "PdbAge", modInfo->PdbAge,
+                       "PdbUnmatched", PyBool_FromLong(modInfo->PdbUnmatched),
+                       "DbgUnmatched", PyBool_FromLong(modInfo->DbgUnmatched),
+                       "LineNumbers", PyBool_FromLong(modInfo->LineNumbers),
+                       "GlobalSymbols", PyBool_FromLong(modInfo->GlobalSymbols),
+                       "TypeInfo", PyBool_FromLong(modInfo->TypeInfo),
+                       "SourceIndexed", PyBool_FromLong(modInfo->SourceIndexed),
+                       "Publics", PyBool_FromLong(modInfo->Publics)
+                   );
+        pKwargs = Py_BuildValue(
+                      "{s:N, s:N, s:s}",
+                      "LoadDll", pLoadDll,
+                      "modInfo", pModInfo,
+                      "modname", callbackInfo->modname
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pLoadDll);
+        Py_DECREF(pPdbSig70);
+        Py_DECREF(pModInfo);
+        Py_DECREF(pKwargs);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use load_dll function.");
+            printPyErr();
+            return;
+        }
+
+        Py_DECREF(pValue);
+    }
+}
+
+static void cbSystemBreakpointCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pValue;
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "system_breakpoint");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pValue = PyObject_CallObject(pFunc, NULL);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use system_breakpoint function.");
+            printPyErr();
+            return;
+        }
+        Py_DECREF(pValue);
+    }
+}
+
+static void cbExitThreadCallback(CBTYPE cbType, void* info)
+{
+    PyObject* pFunc;
+    PyObject* pKwargs, *pValue;
+
+    PLUG_CB_EXITTHREAD* callbackInfo = ((PLUG_CB_EXITTHREAD*)info);
+
+    // Check if event object exist.
+    if(pEventObject == NULL)
+        return;
+
+    pFunc = PyObject_GetAttrString(pEventObject, "exit_thread");
+    if(pFunc && PyCallable_Check(pFunc))
+    {
+        pKwargs = Py_BuildValue(
+                      "{s:k, s:k}",
+                      "dwThreadId", callbackInfo->dwThreadId,
+                      "dwExitCode", callbackInfo->ExitThread->dwExitCode
+                  );
+        pValue = PyObject_Call(pFunc, PyTuple_New(0), pKwargs);
+        Py_DECREF(pKwargs);
+        Py_DECREF(pFunc);
+        if(pValue == NULL)
+        {
+            _plugin_logputs("[PYTHON] Could not use exit_thread function.");
+            printPyErr();
+            return;
+        }
+
+        Py_DECREF(pValue);
+    }
+}
+
 static void cbCreateThreadCallback(CBTYPE cbType, void* info)
 {
     PyObject* pFunc;
@@ -256,7 +430,7 @@ static void cbCreateProcessCallback(CBTYPE cbType, void* info)
                                  "hFile", PyInt_FromSize_t((size_t)CreateProcessInfo->hFile),
                                  "hProcess", PyInt_FromSize_t((size_t)CreateProcessInfo->hProcess),
                                  "hThread", PyInt_FromSize_t((size_t)CreateProcessInfo->hThread),
-                                 "hThread", PyInt_FromSize_t((size_t)CreateProcessInfo->lpBaseOfImage),
+                                 "lpBaseOfImage", PyInt_FromSize_t((size_t)CreateProcessInfo->lpBaseOfImage),
                                  "dwDebugInfoFileOffset", CreateProcessInfo->dwDebugInfoFileOffset,
                                  "nDebugInfoSize", CreateProcessInfo->nDebugInfoSize,
                                  "lpThreadLocalBase", PyInt_FromSize_t((size_t)CreateProcessInfo->lpThreadLocalBase),
@@ -439,6 +613,10 @@ void pyStop()
     _plugin_unregistercallback(pluginHandle, CB_CREATEPROCESS);
     _plugin_unregistercallback(pluginHandle, CB_EXITPROCESS);
     _plugin_unregistercallback(pluginHandle, CB_CREATETHREAD);
+    _plugin_unregistercallback(pluginHandle, CB_EXITTHREAD);
+    _plugin_unregistercallback(pluginHandle, CB_SYSTEMBREAKPOINT);
+    _plugin_unregistercallback(pluginHandle, CB_LOADDLL);
+    _plugin_unregistercallback(pluginHandle, CB_UNLOADDLL);
 
     // Properly ends the python environment
     Py_Finalize();
@@ -461,4 +639,8 @@ void pySetup()
     _plugin_registercallback(pluginHandle, CB_CREATEPROCESS, cbCreateProcessCallback);
     _plugin_registercallback(pluginHandle, CB_EXITPROCESS, cbExitProcessCallback);
     _plugin_registercallback(pluginHandle, CB_CREATETHREAD, cbCreateThreadCallback);
+    _plugin_registercallback(pluginHandle, CB_EXITTHREAD, cbExitThreadCallback);
+    _plugin_registercallback(pluginHandle, CB_SYSTEMBREAKPOINT, cbSystemBreakpointCallback);
+    _plugin_registercallback(pluginHandle, CB_LOADDLL, cbLoadDllCallback);
+    _plugin_registercallback(pluginHandle, CB_UNLOADDLL, cbUnloadDllCallback);
 }

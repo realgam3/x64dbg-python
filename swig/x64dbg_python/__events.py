@@ -5,6 +5,10 @@ EVENTS = [
     'create_process',
     'exit_process',
     'create_thread',
+    'exit_thread',
+    'system_breakpoint',
+    'load_dll',
+    'unload_dll',
 ]
 
 class Event(object):
@@ -53,6 +57,29 @@ class Event(object):
         #     DWORD dwThreadId;
         # } PLUG_CB_CREATETHREAD;
         self.create_thread = None
+        # Keys: dwThreadId, dwExitCode
+        # typedef struct
+        # {
+        #     EXIT_THREAD_DEBUG_INFO* ExitThread;
+        #     DWORD dwThreadId;
+        # } PLUG_CB_EXITTHREAD;
+        self.exit_thread = None
+        # Keys: None
+        self.system_breakpoint = None
+        # Keys: LoadDll, modInfo, modname
+        # typedef LoadDll, modInfo, modname
+        # {
+        #     LOAD_DLL_DEBUG_INFO* LoadDll;
+        #     IMAGEHLP_MODULE64* modInfo;
+        #     const char* modname;
+        # } PLUG_CB_LOADDLL;
+        self.load_dll = None
+        # Keys: lpBaseOfDll
+        # typedef struct
+        # {
+        #     UNLOAD_DLL_DEBUG_INFO* UnloadDll;
+        # } PLUG_CB_UNLOADDLL;
+        self.unload_dll = None
 
     def listen(self, event_name, callback):
         """
