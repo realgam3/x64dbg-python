@@ -5,6 +5,7 @@ x64/
 *.opensdf
 *.sdf
 *.suo
+*.aps
 *.layout
 *.depend
 *.pyc

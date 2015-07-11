@@ -79,6 +79,7 @@
     <ClInclude Include="pluginsdk\_scriptapi_pattern.h" />
     <ClInclude Include="pluginsdk\_scriptapi_register.h" />
     <ClInclude Include="py.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stringutils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +88,12 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="x64dbg-python.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\python.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>

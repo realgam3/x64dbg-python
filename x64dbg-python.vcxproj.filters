@@ -248,5 +248,18 @@
     <ClInclude Include="stringutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="x64dbg-python.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\python.png">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

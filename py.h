@@ -3,6 +3,8 @@
 
 #include "pluginmain.h"
 
+extern HINSTANCE hInst;
+
 //menu identifiers
 #define MENU_OPEN 0
 #define MENU_ABOUT 1

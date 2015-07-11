@@ -20,3 +20,7 @@ def GuiGetLineWindow(title=''):
 
 def GuiGetWindowHandle():
     return _x64dbg.GuiGetWindowHandle()
+
+def GuiLogClear():
+    _x64dbg.GuiLogClear()
+
