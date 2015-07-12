@@ -12,6 +12,8 @@
 #define module_name "x64dbg_python"
 #define event_object_name "Event"
 #define autorun_directory L"plugins\\x64dbg_python\\autorun"
+// lParam: ScanCode=0x41(ALT), cRepeat=1, fExtended=False, fAltDown=True, fRepeat=False, fUp=False
+#define ALT_F7_SYSKEYDOWN 0x20410001
 
 PyObject* pModule, *pEventObject;
 HINSTANCE hInst;
@@ -118,11 +120,11 @@ static void cbWinEventCallback(CBTYPE cbType, void* info)
     MSG* msg = ((PLUG_CB_WINEVENT*)info)->message;
     switch(msg->message)
     {
-    case WM_HOTKEY:
+    case WM_SYSKEYDOWN:
         // Hotkeys
-        switch(msg->wParam)
+        switch(msg->lParam)
         {
-        case MENU_OPEN:
+        case ALT_F7_SYSKEYDOWN:
             _plugin_startscript(OpenScript);
             break;
         }
@@ -639,10 +641,6 @@ void pySetup()
     FreeResource(hMem);
     _plugin_menuaddentry(hMenu, MENU_OPEN, "&OpenScript...\tALT+F7");
     _plugin_menuaddentry(hMenu, MENU_ABOUT, "&About");
-
-    // Set HotKey
-    if(RegisterHotKey(hwndDlg, MENU_OPEN, MOD_ALT | MOD_NOREPEAT, VK_F7))
-        _plugin_logputs("[PYTHON] ALT+F7 HetKey Registered To OpenScript!");
 
     // Set Callbacks
     _plugin_registercallback(pluginHandle, CB_WINEVENT, cbWinEventCallback);
